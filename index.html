@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CricScore Live - Login</title>
+    
+    <!-- Load PyScript CDN -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0f172a;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-card {
+            background-color: #1e293b;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            width: 320px;
+            text-align: center;
+        }
+        .login-card h2 {
+            color: #38bdf8;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #94a3b8;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background-color: #0f172a;
+            color: #fff;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #16a34a;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #15803d;
+        }
+        #message {
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h2>🏏 CricScore Login</h2>
+        
+        <div class="input-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter username">
+        </div>
+
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter password">
+        </div>
+
+        <!-- Call the Python function on click -->
+        <button py-click="handle_login">Log In</button>
+
+        <p id="message"></p>
+    </div>
+
+    <!-- Python Code Running directly in Front End -->
+    <script type="py">
+        from pyscript import document
+
+        def handle_login(event):
+            # Read input field values
+            username = document.querySelector("#username").value
+            password = document.querySelector("#password").value
+            message_box = document.querySelector("#message")
+
+            # Simple login validation logic in Python
+            if username == "fan" and password == "cricket123":
+                message_box.style.color = "#4ade80"
+                message_box.innerText = "Welcome back! Redirecting to live scores..."
+            elif username == "" or password == "":
+                message_box.style.color = "#f87171"
+                message_box.innerText = "Please enter both username and password."
+            else:
+                message_box.style.color = "#f87171"
+                message_box.innerText = "Invalid credentials. Try fan / cricket123"
+    </script>
+
+</body>
+</html>
