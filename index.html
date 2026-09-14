@@ -548,6 +548,13 @@
         <div class="teams-row"><span>New Zealand</span><span class="score">—</span></div>
         <div class="match-meta">Overs 47.5 · Newlands, Cape Town</div>
       </div>
+
+      <a href="match.html" class="match-card" id="userLiveCard" style="display:none; text-decoration:none;">
+        <div class="tag live"><span class="pulse"></span>Live · Hosted by a user</div>
+        <div class="teams-row"><span id="userTeamA">Team A</span><span class="score" id="userScoreA">0/0</span></div>
+        <div class="teams-row"><span id="userTeamB">Team B</span><span class="score">—</span></div>
+        <div class="match-meta" id="userMatchMeta">Overs 0.0</div>
+      </a>
     </div>
   </div>
 </section>
@@ -616,6 +623,28 @@
 <footer>
   <div class="wrap">&copy; 2026 Crease. Built for the love of the game.</div>
 </footer>
+
+<script>
+  function refreshUserLiveCard() {
+    const raw = localStorage.getItem('crease-active-match');
+    const card = document.getElementById('userLiveCard');
+    if (!raw) { card.style.display = 'none'; return; }
+    let m;
+    try { m = JSON.parse(raw); } catch (e) { card.style.display = 'none'; return; }
+    if (m.visibility !== 'public' || m.status !== 'live') { card.style.display = 'none'; return; }
+
+    document.getElementById('userTeamA').textContent = m.teamA;
+    document.getElementById('userScoreA').textContent = m.runs + '/' + m.wickets;
+    document.getElementById('userTeamB').textContent = m.teamB;
+    const overs = Math.floor(m.ballsBowled / 6) + '.' + (m.ballsBowled % 6);
+    document.getElementById('userMatchMeta').textContent = 'Overs ' + overs + ' of ' + m.oversLimit + ' · Hosted match';
+    card.style.display = 'block';
+  }
+
+  refreshUserLiveCard();
+  setInterval(refreshUserLiveCard, 3000);
+  window.addEventListener('storage', refreshUserLiveCard);
+</script>
 
 </body>
 </html>
