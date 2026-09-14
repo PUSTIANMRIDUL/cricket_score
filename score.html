@@ -33,18 +33,132 @@
   a:hover { color: var(--cream); }
 
   .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(11, 43, 31, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--pitch-line);
+  }
+
+  .header-inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 28px;
-    border-bottom: 1px solid var(--pitch-line);
+    height: 72px;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 28px;
   }
 
   .topbar .logo {
     font-family: 'Teko', sans-serif;
-    font-size: 24px;
+    font-size: 30px;
     font-weight: 700;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
+
+  .topbar .logo .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--ball-red-bright);
+    display: inline-block;
+  }
+
+  nav.main-nav { display: flex; gap: 40px; }
+
+  nav.main-nav a {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--cream-dim);
+    position: relative;
+    padding: 4px 0;
+    transition: color 0.2s ease;
+  }
+
+  nav.main-nav a:hover, nav.main-nav a:focus-visible { color: var(--cream); }
+
+  nav.main-nav a.active { color: var(--cream); }
+
+  nav.main-nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 0;
+    height: 2px;
+    background: var(--ball-red-bright);
+    transition: width 0.2s ease;
+  }
+
+  nav.main-nav a:hover::after, nav.main-nav a:focus-visible::after, nav.main-nav a.active::after {
+    width: 100%;
+  }
+
+  .auth-group { display: flex; align-items: center; gap: 12px; }
+
+  .btn-ghost-nav {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 9px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    color: var(--cream);
+    border: 1px solid var(--pitch-line);
+    background: transparent;
+    transition: all 0.2s ease;
+  }
+
+  .btn-ghost-nav:hover { border-color: var(--cream-dim); }
+
+  .btn-solid-nav {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 9px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: var(--ball-red-bright);
+    color: var(--cream);
+  }
+
+  .btn-solid-nav:hover { background: var(--ball-red); }
+
+  .nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--cream);
+    font-size: 26px;
+    cursor: pointer;
+  }
+
+  @media (max-width: 900px) {
+    nav.main-nav, .auth-group { display: none; }
+    .nav-toggle { display: block; }
+  }
+
+  body.nav-open nav.main-nav,
+  body.nav-open .auth-group {
+    display: flex;
+    position: absolute;
+    top: 72px;
+    left: 0;
+    right: 0;
+    background: var(--pitch-dark);
+    flex-direction: column;
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--pitch-line);
+    z-index: 49;
+  }
+
+  body.nav-open .auth-group { top: calc(72px + 168px); flex-direction: row; }
 
   .wrap { max-width: 640px; margin: 0 auto; padding: 40px 24px 80px; }
 
@@ -254,8 +368,22 @@
 <body>
 
 <div class="topbar">
-  <a href="index.html" class="logo">Crease</a>
-  <a href="index.html">Exit scoring</a>
+  <div class="header-inner">
+    <a href="index.html" class="logo"><span class="dot"></span>Crease</a>
+
+    <nav class="main-nav">
+      <a href="index.html#home">Home</a>
+      <a href="index.html#tournaments">Tournament</a>
+      <a href="score.html" class="active">Score Match</a>
+    </nav>
+
+    <div class="auth-group">
+      <button class="btn-ghost-nav">Log in</button>
+      <button class="btn-solid-nav">Sign up</button>
+    </div>
+
+    <button class="nav-toggle" aria-label="Toggle menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+  </div>
 </div>
 
 <div class="wrap">
