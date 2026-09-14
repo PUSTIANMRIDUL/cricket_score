@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Score a Match — Crease</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pitch-dark: #0B2B1F;
+    --pitch-mid: #123726;
+    --pitch-line: #1D4E37;
+    --cream: #F2EDE1;
+    --cream-dim: #C9C3B4;
+    --ball-red: #A8291F;
+    --ball-red-bright: #C7342A;
+    --gold: #C9A227;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--pitch-dark);
+    color: var(--cream);
+    font-family: 'Work Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  h1, h2, .digits { font-family: 'Teko', sans-serif; font-weight: 600; line-height: 1; }
+
+  a { color: var(--cream-dim); text-decoration: none; font-size: 14px; }
+  a:hover { color: var(--cream); }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--pitch-line);
+  }
+
+  .topbar .logo {
+    font-family: 'Teko', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .wrap { max-width: 640px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ---------- Setup screen ---------- */
+  #setup h1 { font-size: 40px; margin-bottom: 8px; }
+  #setup .sub { color: var(--cream-dim); font-size: 15px; margin-bottom: 36px; }
+
+  .field { margin-bottom: 20px; }
+
+  .field label {
+    display: block;
+    font-size: 13px;
+    color: var(--cream-dim);
+    margin-bottom: 6px;
+  }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  input, select {
+    width: 100%;
+    background: var(--pitch-mid);
+    border: 1px solid var(--pitch-line);
+    color: var(--cream);
+    font-family: 'Work Sans', sans-serif;
+    font-size: 15px;
+    padding: 12px 14px;
+    border-radius: 3px;
+  }
+
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+
+  .btn {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 13px 26px;
+    border-radius: 3px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: var(--ball-red-bright);
+    color: var(--cream);
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .btn:hover { background: var(--ball-red); }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--pitch-line);
+    color: var(--cream);
+  }
+
+  .btn-ghost:hover { border-color: var(--cream-dim); }
+
+  /* ---------- Scoring screen ---------- */
+  #scorer { display: none; }
+
+  .scoreboard {
+    background: var(--pitch-mid);
+    border: 1px solid var(--pitch-line);
+    border-radius: 4px;
+    padding: 28px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .scoreboard .teams {
+    font-size: 14px;
+    color: var(--cream-dim);
+    margin-bottom: 6px;
+  }
+
+  .scoreboard .digits { font-size: 68px; color: var(--gold); }
+  .scoreboard .digits small { font-size: 28px; color: var(--cream-dim); }
+
+  .scoreboard .overs {
+    font-size: 15px;
+    color: var(--cream-dim);
+    margin-top: 4px;
+  }
+
+  .who-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .who-card {
+    flex: 1;
+    background: var(--pitch-mid);
+    border: 1px solid var(--pitch-line);
+    border-radius: 4px;
+    padding: 14px 16px;
+  }
+
+  .who-card label {
+    display: block;
+    font-size: 11px;
+    color: var(--cream-dim);
+    margin-bottom: 4px;
+  }
+
+  .who-card input {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 15px;
+  }
+
+  .this-over {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    min-height: 34px;
+    flex-wrap: wrap;
+  }
+
+  .ball-pill {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--pitch-mid);
+    border: 1px solid var(--pitch-line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--cream);
+    flex-shrink: 0;
+  }
+
+  .ball-pill.wicket { background: var(--ball-red-bright); border-color: var(--ball-red-bright); }
+  .ball-pill.boundary { background: var(--gold); border-color: var(--gold); color: var(--pitch-dark); }
+
+  .pad-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .pad-btn {
+    font-family: 'Teko', sans-serif;
+    font-size: 26px;
+    background: var(--pitch-mid);
+    border: 1px solid var(--pitch-line);
+    color: var(--cream);
+    border-radius: 4px;
+    padding: 16px 0;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .pad-btn:hover { background: var(--pitch-line); }
+  .pad-btn.boundary { color: var(--gold); }
+
+  .extras-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .extras-grid .pad-btn { font-family: 'Work Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 12px 0; }
+
+  .wicket-btn {
+    width: 100%;
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    background: var(--ball-red-bright);
+    border: 1px solid var(--ball-red-bright);
+    color: var(--cream);
+    border-radius: 4px;
+    padding: 13px 0;
+    cursor: pointer;
+    margin-bottom: 12px;
+  }
+
+  .wicket-btn:hover { background: var(--ball-red); }
+
+  .util-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .util-row .btn { margin-top: 0; font-size: 13px; padding: 11px 0; }
+
+  .share-note {
+    margin-top: 28px;
+    font-size: 13px;
+    color: var(--cream-dim);
+    text-align: center;
+  }
+
+  @media (max-width: 480px) {
+    .scoreboard .digits { font-size: 52px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="logo">Crease</a>
+  <a href="index.html">Exit scoring</a>
+</div>
+
+<div class="wrap">
+
+  <!-- ---------- Setup screen ---------- -->
+  <div id="setup">
+    <h1>Set up your match</h1>
+    <p class="sub">Enter the basics — you can adjust players as the match goes on.</p>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="teamA">Team batting first</label>
+        <input id="teamA" type="text" placeholder="e.g. Sunday Warriors">
+      </div>
+      <div class="field">
+        <label for="teamB">Team bowling first</label>
+        <input id="teamB" type="text" placeholder="e.g. Riverside XI">
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="overs">Overs per innings</label>
+        <input id="overs" type="number" min="1" value="20">
+      </div>
+      <div class="field">
+        <label for="visibility">Visibility</label>
+        <select id="visibility">
+          <option value="public">Public — shows on homepage</option>
+          <option value="private">Private — link only</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="striker">Striker</label>
+        <input id="striker" type="text" placeholder="Batter on strike">
+      </div>
+      <div class="field">
+        <label for="nonStriker">Non-striker</label>
+        <input id="nonStriker" type="text" placeholder="Batter at other end">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="bowler">Bowler</label>
+      <input id="bowler" type="text" placeholder="Current bowler">
+    </div>
+
+    <button class="btn" onclick="startMatch()">Start scoring</button>
+  </div>
+
+  <!-- ---------- Scoring screen ---------- -->
+  <div id="scorer">
+    <div class="scoreboard">
+      <div class="teams" id="teamsLabel">Team A vs Team B</div>
+      <div class="digits" id="runsWickets">0<small>/0</small></div>
+      <div class="overs" id="oversLabel">Overs 0.0 of 20</div>
+    </div>
+
+    <div class="who-row">
+      <div class="who-card">
+        <label>Striker</label>
+        <input id="strikerDisplay" type="text">
+      </div>
+      <div class="who-card">
+        <label>Non-striker</label>
+        <input id="nonStrikerDisplay" type="text">
+      </div>
+      <div class="who-card">
+        <label>Bowler</label>
+        <input id="bowlerDisplay" type="text">
+      </div>
+    </div>
+
+    <div class="this-over" id="thisOver"></div>
+
+    <div class="pad-grid">
+      <button class="pad-btn" onclick="addRuns(0)">0</button>
+      <button class="pad-btn" onclick="addRuns(1)">1</button>
+      <button class="pad-btn" onclick="addRuns(2)">2</button>
+      <button class="pad-btn" onclick="addRuns(3)">3</button>
+      <button class="pad-btn boundary" onclick="addRuns(4)">4</button>
+      <button class="pad-btn boundary" onclick="addRuns(6)">6</button>
+      <button class="pad-btn" onclick="swapStrike()">Swap</button>
+      <button class="pad-btn" onclick="undoBall()">Undo</button>
+    </div>
+
+    <div class="extras-grid">
+      <button class="pad-btn" onclick="addExtra('wide')">Wide</button>
+      <button class="pad-btn" onclick="addExtra('noball')">No ball</button>
+      <button class="pad-btn" onclick="addExtra('bye')">Bye</button>
+    </div>
+
+    <button class="wicket-btn" onclick="addWicket()">Wicket</button>
+
+    <div class="util-row">
+      <button class="btn btn-ghost" onclick="endOver()">End over</button>
+      <button class="btn btn-ghost" onclick="endInnings()">End innings</button>
+    </div>
+
+    <p class="share-note">This scoring session runs in your browser only — connect it to a backend to save match history and share a live link with viewers.</p>
+  </div>
+
+</div>
+
+<script>
+  let match = null;
+
+  function startMatch() {
+    const teamA = document.getElementById('teamA').value || 'Team A';
+    const teamB = document.getElementById('teamB').value || 'Team B';
+    const overs = parseInt(document.getElementById('overs').value) || 20;
+
+    match = {
+      teamA, teamB, oversLimit: overs,
+      runs: 0, wickets: 0, ballsBowled: 0,
+      striker: document.getElementById('striker').value || 'Striker',
+      nonStriker: document.getElementById('nonStriker').value || 'Non-striker',
+      bowler: document.getElementById('bowler').value || 'Bowler',
+      thisOver: [],
+      history: []
+    };
+
+    document.getElementById('teamsLabel').textContent = teamA + ' vs ' + teamB;
+    document.getElementById('strikerDisplay').value = match.striker;
+    document.getElementById('nonStrikerDisplay').value = match.nonStriker;
+    document.getElementById('bowlerDisplay').value = match.bowler;
+
+    document.getElementById('setup').style.display = 'none';
+    document.getElementById('scorer').style.display = 'block';
+    render();
+  }
+
+  function render() {
+    document.getElementById('runsWickets').innerHTML =
+      match.runs + '<small>/' + match.wickets + '</small>';
+
+    const oversStr = Math.floor(match.ballsBowled / 6) + '.' + (match.ballsBowled % 6);
+    document.getElementById('oversLabel').textContent =
+      'Overs ' + oversStr + ' of ' + match.oversLimit;
+
+    const overWrap = document.getElementById('thisOver');
+    overWrap.innerHTML = '';
+    match.thisOver.forEach(b => {
+      const pill = document.createElement('div');
+      pill.className = 'ball-pill' + (b.wicket ? ' wicket' : (b.runs >= 4 ? ' boundary' : ''));
+      pill.textContent = b.label;
+      overWrap.appendChild(pill);
+    });
+
+    match.striker = document.getElementById('strikerDisplay').value;
+    match.nonStriker = document.getElementById('nonStrikerDisplay').value;
+    match.bowler = document.getElementById('bowlerDisplay').value;
+  }
+
+  function recordBall(entry) {
+    match.history.push(JSON.parse(JSON.stringify({
+      runs: match.runs, wickets: match.wickets, ballsBowled: match.ballsBowled, thisOver: match.thisOver
+    })));
+    match.thisOver.push(entry);
+  }
+
+  function addRuns(n) {
+    recordBall({ label: String(n), runs: n });
+    match.runs += n;
+    match.ballsBowled += 1;
+    if (n % 2 === 1) swapStrike(false);
+    if (match.ballsBowled % 6 === 0) { swapStrike(false); match.thisOver = []; }
+    render();
+  }
+
+  function addExtra(type) {
+    const label = type === 'wide' ? 'Wd' : type === 'noball' ? 'Nb' : 'B';
+    recordBall({ label: label, runs: 1 });
+    match.runs += 1;
+    if (type === 'bye') match.ballsBowled += 1;
+    render();
+  }
+
+  function addWicket() {
+    recordBall({ label: 'W', runs: 0, wicket: true });
+    match.wickets += 1;
+    match.ballsBowled += 1;
+    if (match.ballsBowled % 6 === 0) match.thisOver = [];
+    render();
+  }
+
+  function swapStrike(rerender = true) {
+    const tmp = match.striker;
+    match.striker = match.nonStriker;
+    match.nonStriker = tmp;
+    document.getElementById('strikerDisplay').value = match.striker;
+    document.getElementById('nonStrikerDisplay').value = match.nonStriker;
+    if (rerender) render();
+  }
+
+  function undoBall() {
+    if (match.history.length === 0) return;
+    const prev = match.history.pop();
+    match.runs = prev.runs;
+    match.wickets = prev.wickets;
+    match.ballsBowled = prev.ballsBowled;
+    match.thisOver = prev.thisOver;
+    render();
+  }
+
+  function endOver() {
+    match.thisOver = [];
+    if (match.ballsBowled % 6 !== 0) {
+      match.ballsBowled += (6 - (match.ballsBowled % 6));
+    }
+    swapStrike(false);
+    render();
+  }
+
+  function endInnings() {
+    alert('Innings ended — ' + match.teamA + ' finished on ' + match.runs + '/' + match.wickets +
+      ' in ' + Math.floor(match.ballsBowled / 6) + '.' + (match.ballsBowled % 6) + ' overs.');
+  }
+</script>
+
+</body>
+</html>
